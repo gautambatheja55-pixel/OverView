@@ -22,7 +22,7 @@ def ping_ip(ip):
 def discover_devices(network_address):
     network = ipaddress.ip_network(network_address)
     all_ips = list(network.hosts())
-    with ThreadPoolExecutor(max_workers=10) as executer:
+    with ThreadPoolExecutor(max_workers=20) as executer:
         results = executer.map(ping_ip,all_ips)
     return [ip for ip in results if ip is not None]
 
