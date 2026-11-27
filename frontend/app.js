@@ -2,7 +2,7 @@ const scanButton = document.getElementById("scanButton");
 const deviceCount = document.getElementById("deviceCount");
 const deviceList = document.getElementById("deviceList");
 const scanStatus = document.getElementById("scanStatus");
-const networkMap = document.getElementById("map");
+const networkMap = document.getElementById("deviceLayer");
 
 scanButton.addEventListener("click", async()=>{
     scanButton.textContent = "scanning...";
@@ -23,14 +23,14 @@ scanButton.addEventListener("click", async()=>{
             const angleInDegrees = (index * angleDifference);
             const angle = angleInDegrees * (Math.PI /180);
             const minRadius = 130;
-            const maxRadius = 230;
+            const maxRadius = 230;                                           
             const centerX = 400;
             const centerY = 300;
             const radius= minRadius + Math.random() * (maxRadius-minRadius);
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
             const item = document.createElement("li");
-            item.textContent = ip;
+            item.textContent = item.textContent = `${ip.ip} - ${ip.mac || "MAC unavailable"}`;
             deviceList.appendChild(item);
            
             const lineToDevice = document.createElementNS("http://www.w3.org/2000/svg","line");
@@ -55,7 +55,7 @@ scanButton.addEventListener("click", async()=>{
             deviceLabel.setAttribute("text-anchor","middle");
             deviceLabel.setAttribute("fill","black");
             deviceLabel.setAttribute("font-size","12");
-            deviceLabel.textContent=ip;
+            deviceLabel.textContent=ip.ip;
             networkMap.append(deviceLabel);
            
         });
@@ -85,6 +85,8 @@ async function checkBackend(){
     }
     
 }
+
+
 
 checkBackend();
 setInterval(checkBackend,5000)

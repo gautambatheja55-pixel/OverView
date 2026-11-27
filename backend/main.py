@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.services.device_discovery import discover_devices
 from backend.services.network_info import get_network_info
+from concurrent.futures import ThreadPoolExecutor
+from backend.services.mac_discovery import discover_macs
 
 load_dotenv()
 app = FastAPI()
@@ -30,7 +32,19 @@ async def get_devices():
             "error" : "No active network found"
         }
     network = network_info["network"]
-    devices = discover_devices(network)
+    with ThreadPoolExecutor(max_workers =2 ) as executer:
+        ip_task = executer.submit(discover_devices,network)
+        mac_task = executer.submit(discover_macs, network)
+
+        ips = ip_task.result()
+        macs= mac_task.result()
+    devices =[]
+    for ip in set(ips) | set(macs):
+        devices.append({
+            "ip":ip,
+            "mac":macs.get(ip)
+        })
+    print("Discovered: ",devices)
     return {
         "network":network,
         "count" : len(devices),

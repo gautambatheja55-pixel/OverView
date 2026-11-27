@@ -7,23 +7,38 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>OverView</h1>
-    <p>View all devices connected to your network</p>
-    <section>
+    <header>
+        <div>
+            <h1>OverView</h1>
+            <p>View all devices connected to your network</p>
+        </div>
+        <div>
         <h2>Backend connection</h2>
         <p id="backend-status">Checking connection...</p>
         <p id="backend-message"></p>
-    </section>
-    <button id="scanButton">Scan!</button>
-    <p id="scanStatus">Ready to scan</p>
-    <span id="deviceCount">0 devices</span>
-    <ul id="deviceList"></ul>
-    <section>
+
+      <button id="scanButton">Scan!</button>
+        <p id="scanStatus">Ready to scan</p>
+        <span id="deviceCount">0 devices</span>
+        </div>
+    </header>
+    <main>
+        <section id="mapSection">
+    
         <svg id="map" viewBox="0 0 800 600">
+            <g id="deviceLayer"></g>
+            <g id="routerLayer">
             <circle cx="400" cy="300" r="45" fill="#2564eb"/>
             <text x="400" y="365" text-anchor="middle" fill="black">Wifi Router</text>
+            </g>
         </svg> 
     </section>
+
+    <aside id="deviceDetails">
+        <h2>Device Details: </h2>
+        <p>Select a device on the map to view its details.</p>
+    </aside>
+    </main>
     <script src="app.js"></script>
 </body>
 </html>
