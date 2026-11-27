@@ -1,6 +1,6 @@
 from scapy.all import ARP,Ether,srp
 
-def discover_macs(network_address,timeout=30):
+def discover_macs(network_address,timeout=40):
     arp_request = ARP(pdst=network_address)
 
     broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")

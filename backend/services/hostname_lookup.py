@@ -7,8 +7,4 @@ def get_hostname(ip):
         print(hostname[0])
         return hostname
     except socket.herror as error:
-        print(error)
-
-
-if __name__ == "__main__":
-    print(get_hostname("192.168.29.154"))
+        return None

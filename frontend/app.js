@@ -1,6 +1,5 @@
 const scanButton = document.getElementById("scanButton");
 const deviceCount = document.getElementById("deviceCount");
-const deviceList = document.getElementById("deviceList");
 const scanStatus = document.getElementById("scanStatus");
 const networkMap = document.getElementById("deviceLayer");
 
@@ -16,9 +15,9 @@ scanButton.addEventListener("click", async()=>{
         }
         const data = await response.json()
         console.log(data);
-        deviceCount.textContent = data.count;
+        deviceCount.textContent = `${data.count} devices`;
       
-        data.devices.forEach((ip,index) => {
+        data.devices.forEach((device,index) => {
             const angleDifference = 360/data.count;
             const angleInDegrees = (index * angleDifference);
             const angle = angleInDegrees * (Math.PI /180);
@@ -29,9 +28,6 @@ scanButton.addEventListener("click", async()=>{
             const radius= minRadius + Math.random() * (maxRadius-minRadius);
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
-            const item = document.createElement("li");
-            item.textContent = item.textContent = `${ip.ip} - ${ip.mac || "MAC unavailable"}`;
-            deviceList.appendChild(item);
            
             const lineToDevice = document.createElementNS("http://www.w3.org/2000/svg","line");
             lineToDevice.setAttribute("x1",centerX);
@@ -46,7 +42,11 @@ scanButton.addEventListener("click", async()=>{
             deviceNode.setAttribute("cx",x);
             deviceNode.setAttribute("cy",y);
             deviceNode.setAttribute("r",18);
-            deviceNode.setAttribute("fill","#16a34a");
+            deviceNode.setAttribute("fill","#7b16a3");
+            deviceNode.style.cursor="pointer";
+            deviceNode.addEventListener("click", () => {
+                showDeviceDetails(device);
+            })
             networkMap.append(deviceNode);
           
             const deviceLabel = document.createElementNS("http://www.w3.org/2000/svg","text");
@@ -55,7 +55,7 @@ scanButton.addEventListener("click", async()=>{
             deviceLabel.setAttribute("text-anchor","middle");
             deviceLabel.setAttribute("fill","black");
             deviceLabel.setAttribute("font-size","12");
-            deviceLabel.textContent=ip.ip;
+            deviceLabel.textContent=device.ip;
             networkMap.append(deviceLabel);
            
         });
@@ -86,6 +86,17 @@ async function checkBackend(){
     
 }
 
+function showDeviceDetails(device){
+    const detailsPanel = document.getElementById("deviceDetails");
+    detailsPanel.innerHTML=`
+    <h2>Device Details </h2>
+    <h3>${device.ip}</h3>
+    <p><b>Status: Reachable</b></p>
+    <p><b>IPv4: ${device.ip}</b></p>
+    <p><b>MAC: ${device.mac || "Unavailable"}</b></p>
+    <p><b>Hostname: ${device.hostname || "Unavailable"}</b></p>
+    `;
+}
 
 
 checkBackend();

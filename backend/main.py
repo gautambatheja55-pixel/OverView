@@ -6,6 +6,7 @@ from backend.services.device_discovery import discover_devices
 from backend.services.network_info import get_network_info
 from concurrent.futures import ThreadPoolExecutor
 from backend.services.mac_discovery import discover_macs
+from backend.services.hostname_lookup import get_hostname
 
 load_dotenv()
 app = FastAPI()
@@ -27,6 +28,7 @@ async def get_status():
 async def get_devices():
     network_info=get_network_info()
     print("network info",network_info)
+    print("gateway detected", network_info["gateway"])
     if network_info is None:
         return {
             "error" : "No active network found"
@@ -39,10 +41,13 @@ async def get_devices():
         ips = ip_task.result()
         macs= mac_task.result()
     devices =[]
-    for ip in set(ips) | set(macs):
+    all_devices = set(ips) | set (macs)
+    all_devices.discard(network_info["gateway"])
+    for ip in all_devices:
         devices.append({
             "ip":ip,
-            "mac":macs.get(ip)
+            "mac":macs.get(ip),
+            "hostname": get_hostname(ip)
         })
     print("Discovered: ",devices)
     return {
