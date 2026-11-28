@@ -3,8 +3,6 @@ const deviceCount = document.getElementById("deviceCount");
 const scanStatus = document.getElementById("scanStatus");
 const networkMap = document.getElementById("deviceLayer");
 
-
-
 let timerInterval;
 let startTime;
 
@@ -106,13 +104,35 @@ function showDeviceDetails(device){
     detailsPanel.innerHTML=`
     <h2>Device Details </h2>
     <h3>${device.ip}</h3>
-    <p><b>Status: Reachable</b></p>
-    <p><b>IPv4: ${device.ip}</b></p>
-    <p><b>MAC: ${device.mac || "Unavailable"}</b></p>
-    <p><b>Hostname: ${device.hostname || "Unavailable"}</b></p>
+    <p><b>Status: </b>Reachable</p>
+    <p><b>IPv4: </b>${device.ip}
+    <button class="copyButton" data-copy="${device.ip}" title="Copy IP">
+        <i data-lucide="copy"></i>
+    </button></p>
+    <p><b>MAC: </b> ${device.mac || "Unavailable"}
+    ${device.mac ? `
+    <button class="copyButton" data-copy="${device.mac}" title="Copy MAC">
+        <i data-lucide="copy"></i>
+    </button>` :""}
+    </p>
+    <p><b>Hostname: </b>${device.hostname || "Unavailable"}</p>
     `;
+    lucide.createIcons();
 }
 
+document.getElementById("deviceDetails").addEventListener("click",async (event) => {
+    const button = event.target.closest(".copyButton");
+    if (!button) return;
+    const text = button.dataset.copy;
+    try {
+        await navigator.clipboard.writeText(text);
+        button.title = "Copied!";
+        button.innerHTML = `<i data-lucide="check"></i>`;
+        lucide.createIcons();
+    } catch (error){
+        console.error(error);
+    }
+});
 
 checkBackend();
 setInterval(checkBackend,5000)
