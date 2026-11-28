@@ -3,9 +3,19 @@ const deviceCount = document.getElementById("deviceCount");
 const scanStatus = document.getElementById("scanStatus");
 const networkMap = document.getElementById("deviceLayer");
 
+
+
+let timerInterval;
+let startTime;
+
 scanButton.addEventListener("click", async()=>{
     scanButton.textContent = "scanning...";
     scanButton.disabled=true;
+    startTime = performance.now();
+    timerInterval = setInterval(()=>{
+        const elapsed = (performance.now() - startTime)/1000;
+        scanStatus.textContent=`Scanning... ${elapsed.toFixed(2)}s`;
+    },50);
     scanStatus.textContent="";
     scanButton.style.cursor = "not-allowed";
     try {
@@ -16,7 +26,7 @@ scanButton.addEventListener("click", async()=>{
         const data = await response.json()
         console.log(data);
         deviceCount.textContent = `${data.count} devices`;
-      
+        networkMap.innerHTML="";
         data.devices.forEach((device,index) => {
             const angleDifference = 360/data.count;
             const angleInDegrees = (index * angleDifference);
@@ -65,6 +75,11 @@ scanButton.addEventListener("click", async()=>{
         scanButton.disabled = false;
         scanButton.style.cursor = "pointer";
         scanButton.textContent = "Scan!"
+        clearInterval(timerInterval);
+        if (startTime !== undefined){
+            const elapsed = (performance.now() - startTime)/1000;
+            scanStatus.textContent = `Scan completed in ${elapsed.toFixed(2)}s`
+        }
     }
 });
 

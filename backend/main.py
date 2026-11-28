@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,8 @@ from backend.services.mac_discovery import discover_macs
 from backend.services.hostname_lookup import get_hostname
 
 load_dotenv()
+print("ENV variable", repr(os.getenv("ALLOWED_ORIGINS")))
+print("ENV FILE FOUND: ", os.path.exists(".env"))
 app = FastAPI()
 origins = os.getenv("ALLOWED_ORIGINS","").split(",")
 app.add_middleware(
@@ -26,13 +29,14 @@ async def get_status():
 
 @app.get("/api/devices")
 async def get_devices():
+    start_time=time.perf_counter()
     network_info=get_network_info()
     print("network info",network_info)
-    print("gateway detected", network_info["gateway"])
     if network_info is None:
         return {
             "error" : "No active network found"
         }
+    print("gateway detected", network_info["gateway"])
     network = network_info["network"]
     with ThreadPoolExecutor(max_workers =2 ) as executer:
         ip_task = executer.submit(discover_devices,network)
@@ -50,8 +54,10 @@ async def get_devices():
             "hostname": get_hostname(ip)
         })
     print("Discovered: ",devices)
+    elapsed_time = round(time.perf_counter() - start_time,2)
     return {
         "network":network,
         "count" : len(devices),
-        "devices" : devices
+        "devices" : devices,
+        "elapsed_time" : elapsed_time
     }
